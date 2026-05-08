@@ -2,7 +2,7 @@
   "use strict";
 
   // ------- Configuration -------
-  const SERVICE_NAME = "Bee & Coo Glass Glow";
+  const SERVICE_NAME = "Glass Glow";
   const SERVICE_DURATION_MIN = 60;
 
   // GHL credentials
@@ -15,7 +15,7 @@
     version:    '2021-07-28',
   };
 
-  const BUSINESS_TZ = "America/Los_Angeles";
+  const BUSINESS_TZ = "America/New_York";
 
   // Generate 1-hr slots from 9 AM to 5 PM
   function buildAllSlots() {
@@ -281,8 +281,8 @@
         lastName: lastName || '-',
         email,
         phone,
-        source: 'Bee & Coo Glass Glow LP',
-        tags: ['Bee & Coo Glass Glow'],
+        source: 'Glass Glow LP',
+        tags: ['Glass Glow'],
       });
       const contactId = contactRes.contact?.id || contactRes.id;
 
@@ -294,7 +294,7 @@
         assignedUserId: GHL.userId,
         startTime: isoInTz(start, BUSINESS_TZ),
         endTime:   isoInTz(end,   BUSINESS_TZ),
-        title:     `${name} — Bee & Coo Glass Glow`,
+        title:     `${name} — Glass Glow`,
       });
 
       track("Lead", { content_name: SERVICE_NAME });
