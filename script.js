@@ -4,6 +4,7 @@
   // ------- Configuration -------
   const SERVICE_NAME = "Glass Glow";
   const SERVICE_DURATION_MIN = 60;
+  const DEDICATED_PIXEL_ID = '1530157268093634';
 
   // GHL credentials
   const GHL = {
@@ -220,9 +221,24 @@
 
   function track(event, params) {
     if (typeof window.fbq === "function") {
-      try { window.fbq("track", event, params || {}); } catch (_) {}
+      try { window.fbq("trackSingle", "1178133073434960", event, params || {}); } catch (_) {}
     }
   }
+  function trackDedicated(event, params, eventId) {
+    if (typeof window.fbq === "function" && DEDICATED_PIXEL_ID) {
+      try {
+        var opts = eventId ? { eventID: eventId } : {};
+        window.fbq("trackSingle", DEDICATED_PIXEL_ID, event, params || {}, opts);
+      } catch (_) {}
+    }
+  }
+
+  // ------- Fire ViewContent to dedicated pixel once ---
+  (function() {
+    if (typeof window.fbq === "function" && DEDICATED_PIXEL_ID) {
+      try { window.fbq("trackSingle", DEDICATED_PIXEL_ID, "ViewContent", { content_name: SERVICE_NAME }); } catch (_) {}
+    }
+  })();
 
   // ------- Back buttons -------
   document.querySelectorAll(".back-btn").forEach((btn) => {
@@ -265,6 +281,8 @@
     btnLabel.textContent = "Booking";
     spinner.classList.remove("hidden");
 
+    const eventId = "sch_" + Date.now() + "_" + Math.random().toString(36).slice(2, 10);
+
     const start = dateFromWallTime(
       selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate(),
       selectedTime.hour, selectedTime.minute, BUSINESS_TZ,
@@ -304,6 +322,20 @@
 
       track("Lead", { content_name: SERVICE_NAME });
       track("Schedule", { content_name: SERVICE_NAME });
+      trackDedicated("Schedule", { content_name: SERVICE_NAME }, eventId);
+      try {
+        fetch('/api/capi', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            eventId, email, phone,
+            eventSourceUrl: window.location.href,
+            contentName: SERVICE_NAME,
+            fbp: (document.cookie.match(/_fbp=([^;]+)/) || [])[1],
+            fbc: (document.cookie.match(/_fbc=([^;]+)/) || [])[1],
+          }),
+        }).catch(function(){});
+      } catch(_) {}
 
       renderConfirmation({
         service: SERVICE_NAME,
