@@ -360,7 +360,9 @@
 
       track("Lead", { content_name: SERVICE_NAME });
       if (!TEST && bookingStatus === 'success') track("Schedule", { content_name: SERVICE_NAME });
+      if (!TEST && bookingStatus === 'success') track("CompleteRegistration", { content_name: SERVICE_NAME });
       if (!TEST && bookingStatus === 'success') trackDedicated("Schedule", { content_name: SERVICE_NAME }, eventId);
+      if (!TEST && bookingStatus === 'success') trackDedicated("CompleteRegistration", { content_name: SERVICE_NAME }, eventId);
       try {
         fetch('/api/capi', {
           method: 'POST',
